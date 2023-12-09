@@ -1,18 +1,25 @@
 package com.dicoding.habitapp.data
 
 import android.content.Context
+import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
 import androidx.room.Dao
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.dicoding.habitapp.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.concurrent.Executors
 
-//TODO 3 : DONE Define room database class and prepopulate database using JSON
+//TODO 3 : DONE Define room database class and prepopulate database using JSON APAKAH INI DAH
 
 @Database(entities = [Habit::class], version = 1, exportSchema = false)
 abstract class HabitDatabase : RoomDatabase() {
@@ -25,28 +32,49 @@ abstract class HabitDatabase : RoomDatabase() {
         private var INSTANCE: HabitDatabase? = null
 
         fun getInstance(context: Context): HabitDatabase {
-            throw NotImplementedError("Not yet implemented")
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    HabitDatabase::class.java,
+                    "habit_database"
+                )
+                    .fallbackToDestructiveMigration()
+                    .addCallback(object : Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            Executors.newSingleThreadExecutor().execute {
+                                fillWithStartingData(context)
+                            }
+                        }
+                    })
+                    .build()
+
+                INSTANCE = instance
+                instance
+            }
         }
 
-        private fun fillWithStartingData(context: Context, dao: HabitDao) {
-            val jsonArray = loadJsonArray(context)
-            try {
-                if (jsonArray != null) {
-                    for (i in 0 until jsonArray.length()) {
-                        val item = jsonArray.getJSONObject(i)
-                        dao.insertAll(
-                            Habit(
+        private fun fillWithStartingData(context: Context) {
+            val habitDao = INSTANCE?.habitDao()
+            habitDao?.let { dao ->
+                try {
+                    val jsonArray = loadJsonArray(context)
+                    jsonArray?.let {
+                        for (i in 0 until jsonArray.length()) {
+                            val item = jsonArray.getJSONObject(i)
+                            val habit = Habit(
                                 item.getInt("id"),
                                 item.getString("title"),
-                                item.getLong("focusTime"),
+                                item.getLong("minutesFocus"), // Use consistent key
                                 item.getString("startTime"),
                                 item.getString("priorityLevel")
                             )
-                        )
+                            dao.insertAll(habit)
+                        }
                     }
+                } catch (exception: Exception) {
+                    exception.printStackTrace()
                 }
-            } catch (exception: JSONException) {
-                exception.printStackTrace()
             }
         }
 
@@ -65,9 +93,11 @@ abstract class HabitDatabase : RoomDatabase() {
                 exception.printStackTrace()
             } catch (exception: JSONException) {
                 exception.printStackTrace()
+            } finally {
+                `in`.close() // Close the InputStream when done
             }
             return null
         }
-
     }
 }
+

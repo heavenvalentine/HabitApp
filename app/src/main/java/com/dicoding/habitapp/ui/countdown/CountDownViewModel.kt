@@ -38,6 +38,7 @@ class CountDownViewModel : ViewModel() {
                 resetTimer()
             }
         }
+        //TODO BUATAN: APAKAH SAYA PERLU startTimer()
     }
 
     fun startTimer() {

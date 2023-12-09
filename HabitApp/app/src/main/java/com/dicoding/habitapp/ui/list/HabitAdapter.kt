@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.habitapp.R
 import com.dicoding.habitapp.data.Habit
+import javax.swing.text.View
 
 class HabitAdapter(
     private val onClick: (Habit) -> Unit
@@ -16,7 +17,7 @@ class HabitAdapter(
 
     //TODO 8 : Create and initialize ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitViewHolder {
-        throw NotImplementedError("Not yet implemented")
+        val view: View = LayoutInflater.from(parent.context).inflate(R.layout.ite)
     }
 
     override fun onBindViewHolder(holder: HabitViewHolder, position: Int) {
