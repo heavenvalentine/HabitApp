@@ -6,6 +6,7 @@ import androidx.paging.PagedList
 import com.dicoding.habitapp.utils.HabitSortType
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.dicoding.habitapp.utils.HabitSortType
 
 class HabitRepository(private val habitDao: HabitDao, private val executor: ExecutorService) {
 
@@ -31,7 +32,17 @@ class HabitRepository(private val habitDao: HabitDao, private val executor: Exec
 
     //TODO 4 : Use SortUtils.getSortedQuery to create sortable query and build paged list
     fun getHabits(sortType: HabitSortType): LiveData<PagedList<Habit>> {
-        throw NotImplementedError("Not yet implemented")
+        val sortedQuery = SortUtils.getSortedQuery(sortType)
+
+        val dataSourceFactory = habitDao.getHabits(sortedQuery)
+        val config = PagedList.Config.Builder()
+            .setPageSize(PAGE_SIZE)
+            .setEnablePlaceholders(false)
+            .build()
+
+        return LivePagedListBuilder(dataSourceFactory, config)
+            .setFetchExecutor(executor)
+            .build()
     }
 
     //TODO 5 : Complete other function inside repository

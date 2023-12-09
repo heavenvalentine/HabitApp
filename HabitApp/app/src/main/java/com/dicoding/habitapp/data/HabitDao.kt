@@ -5,8 +5,8 @@ import androidx.paging.DataSource
 import androidx.sqlite.db.SupportSQLiteQuery
 
 //TODO 2 : Define data access object (DAO)
-interface HabitDao {
-
+@Dao
+interface HabitaDao {
     fun getHabits(query: SupportSQLiteQuery): DataSource.Factory<Int, Habit>
 
     fun getHabitById(habitId: Int): LiveData<Habit>
