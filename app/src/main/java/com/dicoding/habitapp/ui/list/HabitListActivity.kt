@@ -13,6 +13,7 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.dicoding.habitapp.R
 import com.dicoding.habitapp.data.Habit
 import com.dicoding.habitapp.setting.SettingsActivity
@@ -46,13 +47,15 @@ class HabitListActivity : AppCompatActivity() {
         //TODO 6 : DONE Initiate RecyclerView with LayoutManager
 
         recycler = findViewById(R.id.rv_habit)
-        recycler.layoutManager = LinearLayoutManager(this)
+        recycler.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
         initAction()
 
         val factory = ViewModelFactory.getInstance(this)
         viewModel = ViewModelProvider(this, factory)[HabitListViewModel::class.java]
 
         //TODO 7 : DONE Submit pagedList to adapter and add intent to detail
+
         viewModel.habits.observe(this, Observer (this::setUpRecycler))
 
         viewModel.snackbarText.observe(this, Observer(this::showSnackBar))
@@ -105,8 +108,6 @@ class HabitListActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
 
     private fun showSortingPopUpMenu() {
         val view = findViewById<View>(R.id.action_sort) ?: return

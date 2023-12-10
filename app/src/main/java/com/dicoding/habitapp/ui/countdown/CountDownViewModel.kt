@@ -14,12 +14,10 @@ class CountDownViewModel : ViewModel() {
     private val initialTime = MutableLiveData<Long>()
     private val currentTime = MutableLiveData<Long>()
 
-    // The String version of the current time (hh:mm:ss)
     val currentTimeString = currentTime.map { time ->
         DateUtils.formatElapsedTime(time / 1000)
     }
 
-    // Event which triggers the end of count down
     private val _eventCountDownFinish = MutableLiveData<Boolean>()
     val eventCountDownFinish: LiveData<Boolean> = _eventCountDownFinish
 
@@ -38,7 +36,6 @@ class CountDownViewModel : ViewModel() {
                 resetTimer()
             }
         }
-        //TODO BUATAN: APAKAH SAYA PERLU startTimer()
     }
 
     fun startTimer() {

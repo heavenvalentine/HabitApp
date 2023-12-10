@@ -41,16 +41,14 @@ class SettingsActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT > 32) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            //TODO NOTIF MASI BERMASALAH
         }
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
-
             //TODO 11 : DONE Update theme based on value in ListPreference
-
-
             val darkModePreference = findPreference<ListPreference>(getString(R.string.pref_key_dark))
             darkModePreference?.setOnPreferenceChangeListener { _, newValue ->
                 val themeMode = when (newValue.toString()) {
